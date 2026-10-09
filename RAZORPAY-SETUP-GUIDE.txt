@@ -1,0 +1,117 @@
+══════════════════════════════════════════════════════════════
+  RAZORPAY PAYMENT INTEGRATION - QUICK SETUP GUIDE
+══════════════════════════════════════════════════════════════
+
+✅ RAZORPAY INTEGRATION IS READY!
+Now you just need to add your API keys.
+
+──────────────────────────────────────────────────────────────
+STEP 1: GET YOUR RAZORPAY API KEYS
+──────────────────────────────────────────────────────────────
+
+1. Go to: https://razorpay.com/
+2. Sign up or Login
+3. Go to: Dashboard → Settings → API Keys
+4. Click "Generate Test Keys" (or use existing keys)
+5. You'll see two keys:
+   - Key ID (public): rzp_test_xxxxxxxxxxxxx
+   - Key Secret (private): Keep it secret!
+
+──────────────────────────────────────────────────────────────
+STEP 2: ADD KEYS TO YOUR .env FILE
+──────────────────────────────────────────────────────────────
+
+1. Open the file: .env (in project root)
+
+2. Add these lines at the end:
+
+# Razorpay Configuration
+VITE_RAZORPAY_KEY_ID=rzp_test_YOUR_KEY_ID_HERE
+VITE_RAZORPAY_KEY_SECRET=YOUR_KEY_SECRET_HERE
+
+3. Replace YOUR_KEY_ID_HERE and YOUR_KEY_SECRET_HERE with your actual keys
+
+Example:
+VITE_RAZORPAY_KEY_ID=rzp_test_9TpM2K7Lm3nOpQ
+VITE_RAZORPAY_KEY_SECRET=abcdef123456789xyz
+
+4. Save the file
+
+──────────────────────────────────────────────────────────────
+STEP 3: RESTART YOUR SERVER
+──────────────────────────────────────────────────────────────
+
+1. Stop your development server (press Ctrl+C)
+2. Start it again: npm run dev
+
+──────────────────────────────────────────────────────────────
+STEP 4: TEST THE PAYMENT
+──────────────────────────────────────────────────────────────
+
+1. Go to POS page
+2. Add items to cart
+3. Click "Process Sale"
+4. Select "Razorpay" payment method
+5. Razorpay checkout will open
+
+Test with these cards (in Test Mode):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SUCCESS CARD:
+Card: 4111 1111 1111 1111
+CVV: 123
+Expiry: Any future date (e.g., 12/25)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+UPI Test:
+UPI ID: success@razorpay
+
+──────────────────────────────────────────────────────────────
+FEATURES AVAILABLE
+──────────────────────────────────────────────────────────────
+
+✓ UPI Payments (Google Pay, PhonePe, Paytm, etc.)
+✓ Debit/Credit Cards (All major banks)
+✓ Net Banking (50+ banks)
+✓ Digital Wallets
+✓ Auto payment verification
+✓ Payment ID saved automatically
+✓ Invoice generated with payment details
+
+──────────────────────────────────────────────────────────────
+GOING LIVE (PRODUCTION)
+──────────────────────────────────────────────────────────────
+
+When ready to accept real payments:
+
+1. Complete KYC on Razorpay dashboard
+2. Submit business documents
+3. Get Live API keys (from Dashboard)
+4. Replace test keys with live keys in .env:
+
+VITE_RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxx
+VITE_RAZORPAY_KEY_SECRET=your_live_secret
+
+5. Restart server
+6. Test with small amount first!
+
+──────────────────────────────────────────────────────────────
+NEED HELP?
+──────────────────────────────────────────────────────────────
+
+📖 Full Documentation: RAZORPAY-INTEGRATION.md
+🌐 Razorpay Docs: https://razorpay.com/docs/
+💬 Razorpay Support: https://razorpay.com/support/
+
+──────────────────────────────────────────────────────────────
+IMPORTANT NOTES
+──────────────────────────────────────────────────────────────
+
+⚠️  Never share your Key Secret publicly
+⚠️  Don't commit .env file to git
+⚠️  Use Test keys for development
+⚠️  Use Live keys only in production
+⚠️  Test thoroughly before going live
+
+══════════════════════════════════════════════════════════════
+  THAT'S IT! YOU'RE READY TO ACCEPT PAYMENTS! 🎉
+══════════════════════════════════════════════════════════════
