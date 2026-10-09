@@ -3,7 +3,7 @@ import { create } from 'zustand'
 const useCartStore = create((set, get) => ({
   items: [],
   customer: null,
-  saleType: 'retail', // 'retail' or 'wholesale'
+  saleType: null, // null initially, 'retail' or 'wholesale' when selected
   paymentMethod: 'cash',
   discount: 0,
   
@@ -25,13 +25,14 @@ const useCartStore = create((set, get) => ({
       set({ items: updatedItems })
     } else {
       // Add new item
+      const saleType = get().saleType
       const newItem = {
         id: `${medicine.id}-${batch.id}`,
         medicine,
         batch,
         quantity,
         freeQuantity,
-        price: get().saleType === 'retail' ? batch.selling_price : batch.wholesale_price,
+        price: saleType === 'wholesale' ? batch.wholesale_price : batch.selling_price,
         discount: 0
       }
       set({ items: [...items, newItem] })
@@ -133,7 +134,8 @@ const useCartStore = create((set, get) => ({
   // Clear cart
   clearCart: () => set({ 
     items: [], 
-    customer: null, 
+    customer: null,
+    saleType: null, // Reset to no selection
     discount: 0 
   }),
 

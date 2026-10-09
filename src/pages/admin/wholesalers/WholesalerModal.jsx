@@ -18,8 +18,10 @@ const wholesalerSchema = z.object({
   gstin: z.string().optional(),
   drug_license_number: z.string().min(1, 'Drug License Number is required'),
   drug_license_expiry: z.string().min(1, 'Drug License Expiry is required'),
+  fssai_number: z.string().optional(),
   pan: z.string().optional(),
   credit_limit: z.number().min(0).default(0),
+  opening_balance: z.number().min(0).default(0),
   payment_terms: z.number().min(0).default(30),
   status: z.enum(['active', 'inactive']).default('active')
 })
@@ -43,6 +45,7 @@ const WholesalerModal = ({ wholesaler, onClose, onSave }) => {
     } : {
       status: 'active',
       credit_limit: 0,
+      opening_balance: 0,
       payment_terms: 30
     }
   })
@@ -67,6 +70,7 @@ const WholesalerModal = ({ wholesaler, onClose, onSave }) => {
         state: data.state || null,
         pincode: data.pincode || null,
         gstin: data.gstin || null,
+        fssai_number: data.fssai_number || null,
         pan: data.pan || null
       }
 
@@ -303,6 +307,18 @@ const WholesalerModal = ({ wholesaler, onClose, onSave }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  FSSAI Number <span className="text-xs text-gray-500">(Optional)</span>
+                </label>
+                <input
+                  {...register('fssai_number')}
+                  type="text"
+                  className="input-field"
+                  placeholder="Enter FSSAI number"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   PAN
                 </label>
                 <input
@@ -326,6 +342,20 @@ const WholesalerModal = ({ wholesaler, onClose, onSave }) => {
                 </label>
                 <input
                   {...register('credit_limit', { valueAsNumber: true })}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="input-field"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Opening Balance (₹)
+                </label>
+                <input
+                  {...register('opening_balance', { valueAsNumber: true })}
                   type="number"
                   step="0.01"
                   min="0"

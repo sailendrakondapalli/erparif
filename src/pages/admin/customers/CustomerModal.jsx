@@ -16,6 +16,12 @@ const customerSchema = z.object({
   customer_type: z.enum(['individual', 'retailer', 'wholesaler']).default('individual'),
   patient_id: z.string().optional(),
   emergency_contact: z.string().optional(),
+  business_name: z.string().optional(),
+  gstin: z.string().optional(),
+  drug_license_number: z.string().optional(),
+  fssai_number: z.string().optional(),
+  credit_limit: z.string().optional(),
+  opening_balance: z.string().optional(),
   notes: z.string().optional(),
   status: z.enum(['active', 'inactive']).default('active')
 })
@@ -61,6 +67,12 @@ const CustomerModal = ({ customer, onClose, onSave }) => {
         gender: data.gender || null,
         patient_id: data.patient_id || null,
         emergency_contact: data.emergency_contact || null,
+        business_name: data.business_name || null,
+        gstin: data.gstin || null,
+        drug_license_number: data.drug_license_number || null,
+        fssai_number: data.fssai_number || null,
+        credit_limit: data.credit_limit ? parseFloat(data.credit_limit) : null,
+        opening_balance: data.opening_balance ? parseFloat(data.opening_balance) : 0,
         notes: data.notes || null
       }
 
@@ -87,7 +99,8 @@ const CustomerModal = ({ customer, onClose, onSave }) => {
       onSave()
     } catch (error) {
       console.error('Error saving customer:', error)
-      toast.error(error.message || 'Error saving customer')
+      console.error('Error details:', JSON.stringify(error, null, 2))
+      toast.error(error.message || error.hint || 'Error saving customer')
     } finally {
       setLoading(false)
     }
@@ -266,6 +279,103 @@ const CustomerModal = ({ customer, onClose, onSave }) => {
                       placeholder="Enter emergency contact"
                     />
                   </div>
+                </>
+              )}
+
+              {(customerType === 'retailer' || customerType === 'wholesaler') && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Business Name *
+                    </label>
+                    <input
+                      {...register('business_name')}
+                      type="text"
+                      className="input-field"
+                      placeholder="Enter business name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      GSTIN
+                    </label>
+                    <input
+                      {...register('gstin')}
+                      type="text"
+                      className="input-field"
+                      placeholder="Enter GSTIN number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Drug License Number
+                    </label>
+                    <input
+                      {...register('drug_license_number')}
+                      type="text"
+                      className="input-field"
+                      placeholder="Enter drug license number"
+                    />
+                  </div>
+
+                  {customerType === 'wholesaler' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          FSSAI Number
+                        </label>
+                        <input
+                          {...register('fssai_number')}
+                          type="text"
+                          className="input-field"
+                          placeholder="Enter FSSAI number"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Credit Limit (₹)
+                        </label>
+                        <input
+                          {...register('credit_limit')}
+                          type="number"
+                          step="0.01"
+                          className="input-field"
+                          placeholder="Enter credit limit"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Opening Balance (₹)
+                        </label>
+                        <input
+                          {...register('opening_balance')}
+                          type="number"
+                          step="0.01"
+                          className="input-field"
+                          placeholder="Enter opening balance"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {customerType === 'retailer' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Opening Balance (₹)
+                      </label>
+                      <input
+                        {...register('opening_balance')}
+                        type="number"
+                        step="0.01"
+                        className="input-field"
+                        placeholder="Enter opening balance"
+                      />
+                    </div>
+                  )}
                 </>
               )}
 

@@ -1,0 +1,41 @@
+VERCEL DEPLOYMENT - FIX 404 ERRORS
+=====================================
+
+Your vercel.json is already configured correctly!
+
+WHAT'S BEEN DONE:
+-----------------
+1. vercel.json created with rewrites to handle client-side routing
+2. All routes (like /admin/pos) will now work when accessed directly
+3. Page refreshes won't cause 404 errors anymore
+
+TO DEPLOY:
+----------
+1. Open terminal in your project folder
+
+2. Add all files:
+   git add .
+
+3. Commit changes:
+   git commit -m "Fix Vercel routing - add vercel.json for SPA support"
+
+4. Push to GitHub:
+   git push origin main
+   (or 'git push origin master' if your branch is named master)
+
+5. Vercel will automatically deploy (if auto-deploy is enabled)
+   Or manually trigger deploy from Vercel dashboard
+
+TESTING:
+--------
+After deployment:
+1. Try opening: https://your-app.vercel.app/admin/pos directly
+2. Try refreshing any nested route
+3. All routes should now work without 404 errors!
+
+HOW IT WORKS:
+-------------
+The vercel.json file tells Vercel to redirect ALL routes to index.html,
+allowing React Router to handle routing on the client side.
+
+This is the standard solution for SPAs (Single Page Applications) on Vercel.
