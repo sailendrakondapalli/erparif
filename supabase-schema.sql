@@ -1,4 +1,4 @@
--- Pharmacy ERP Database Schema
+-- BillSprout Smart ERP Database Schema
 -- This file contains all the SQL statements to set up the database structure
 
 -- Enable necessary extensions

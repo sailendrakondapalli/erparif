@@ -26,7 +26,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here`
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Supabase Setup Required</h1>
             <p className="text-gray-600 mt-2">
-              Please configure your Supabase credentials to use the Pharmacy ERP system
+              Please configure your Supabase credentials to use the BillSprout Smart ERP system
             </p>
           </div>
 

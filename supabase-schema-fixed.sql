@@ -1,4 +1,4 @@
--- Pharmacy ERP Database Schema - Fixed RLS Policies
+-- BillSprout Smart ERP Database Schema - Fixed RLS Policies
 -- This file contains all the SQL statements to set up the database structure
 
 -- Enable necessary extensions

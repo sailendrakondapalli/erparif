@@ -1,4 +1,4 @@
--- Pharmacy ERP Seed Data
+-- BillSprout Smart ERP Seed Data
 -- This file contains sample data for development and testing purposes
 -- WARNING: This is for development only - do not use in production
 

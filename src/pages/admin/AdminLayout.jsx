@@ -71,7 +71,7 @@ const AdminLayout = ({ children }) => {
             <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center">
               <span className="text-lg font-bold text-primary-600">Rx</span>
             </div>
-            <span className="ml-3 text-lg font-semibold text-white">Pharmacy ERP</span>
+            <span className="ml-3 text-lg font-semibold text-white">BillSprout Smart ERP</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}

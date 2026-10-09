@@ -1,5 +1,6 @@
 {
-  "name": "pharmacy-erp",
+  "name": "billsprout-smart-erp",
+  "description": "BillSprout Smart ERP - Fast Billing System by LifeSprouts Care",
   "private": true,
   "version": "0.0.0",
   "type": "module",

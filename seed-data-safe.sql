@@ -1,4 +1,4 @@
--- Pharmacy ERP Safe Seed Data
+-- BillSprout Smart ERP Safe Seed Data
 -- This file can be run multiple times safely without errors
 -- It will only insert data that doesn't already exist
 

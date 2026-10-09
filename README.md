@@ -1,6 +1,6 @@
-# Pharmacy ERP - Management System
+# BillSprout Smart ERP - Fast Billing System by LifeSprouts Care
 
-A comprehensive, full-stack Pharmacy ERP system built with React, Vite, and Supabase. This is a production-ready application that handles all aspects of pharmacy management including inventory, sales, purchases, customer management, and reporting.
+A comprehensive, full-stack BillSprout Smart ERP system built with React, Vite, and Supabase. This is a production-ready application that handles all aspects of pharmacy management including inventory, sales, purchases, customer management, and reporting.
 
 ## 🚀 Features
 
