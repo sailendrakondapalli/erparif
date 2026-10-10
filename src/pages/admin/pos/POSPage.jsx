@@ -4,7 +4,7 @@ import useCartStore from '../../../store/cartStore'
 import { supabase } from '../../../lib/supabase'
 import toast from 'react-hot-toast'
 import { createRoot } from 'react-dom/client'
-import ThermalInvoice from '../../../components/ThermalInvoice'
+import LandscapeInvoice from '../../../components/LandscapeInvoice'
 
 const POSPage = () => {
   const [medicines, setMedicines] = useState([])
@@ -359,39 +359,58 @@ const POSPage = () => {
     }
   }
 
-  const generateThermalInvoice = (sale, saleItems, paperSize = '80mm') => {
-    const printWindow = window.open('', '_blank', 'width=800,height=600')
-    
-    const companyDetails = {
-      name: 'LIFESPROUTS CARE',
+  const generateThermalInvoice = async (sale, saleItems, paperSize = '80mm') => {
+    // Fetch settings from database
+    const { data: settings } = await supabase
+      .from('settings')
+      .select('*')
+      .limit(1)
+      .single()
+
+    const companyDetails = settings || {
+      pharmacy_name: 'LIFESPROUTS CARE',
       address: '2-190/6 Peikaji Nagar Asifabad, Kommurum Bheem Asifabad',
-      city: 'TELANGANA-504203',
+      state: 'TELANGANA',
       gstin: '36CTUPD3541E1ZO',
-      drug_license: '(20B&21B)TG/AS/2025-139054',
+      drug_license_number: '(20B&21B)TG/AS/2025-139054',
       phone: '9666105832, 9959838249',
       email: 'vedithapharma@gmail.com'
     }
 
+    // Open print window
+    const printWindow = window.open('', '_blank', 'width=1200,height=800')
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Invoice - ${sale.invoice_number}</title>
+      </head>
+      <body>
+        <div id="invoice-root"></div>
+      </body>
+      </html>
+    `)
+    printWindow.document.close()
+
     // Create container for React component
-    const container = printWindow.document.createElement('div')
-    printWindow.document.body.appendChild(container)
+    const container = printWindow.document.getElementById('invoice-root')
     
     // Render React component to print window
     const root = createRoot(container)
     root.render(
-      <ThermalInvoice
+      <LandscapeInvoice
         sale={sale}
         items={saleItems}
         customer={customer}
         companyDetails={companyDetails}
-        paperSize={paperSize}
       />
     )
 
     // Wait for rendering and print
     setTimeout(() => {
       printWindow.print()
-    }, 500)
+    }, 800)
   }
 
   const generateInvoicePrint = (sale, saleItems) => {

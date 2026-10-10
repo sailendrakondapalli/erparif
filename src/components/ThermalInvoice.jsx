@@ -198,20 +198,21 @@ const ThermalInvoice = ({
           border-collapse: collapse;
           margin: 6px 0;
           font-size: 8px;
+          border: 1px solid #000;
         }
 
         .items-table th {
-          border-top: 1px solid #000;
-          border-bottom: 1px solid #000;
+          border: 1px solid #000;
           padding: 2px 1px;
           text-align: left;
           font-weight: bold;
           font-size: 7px;
+          background-color: #f5f5f5;
         }
 
         .items-table td {
           padding: 2px 1px;
-          border-bottom: 1px dotted #ccc;
+          border: 1px solid #000;
           vertical-align: top;
         }
 
@@ -230,24 +231,26 @@ const ThermalInvoice = ({
         }
 
         .tax-summary {
-          border-top: 1px solid #000;
-          padding-top: 4px;
-          margin-top: 4px;
+          border: 1px solid #000;
+          padding: 4px;
+          margin: 4px 0;
           font-size: 9px;
         }
 
         .tax-summary-table {
           width: 100%;
           margin: 4px 0;
+          border-collapse: collapse;
         }
 
         .tax-summary-table td {
           padding: 2px 4px;
+          border: 1px solid #000;
         }
 
         .totals-section {
-          border-top: 1px dashed #000;
-          padding-top: 4px;
+          border: 1px solid #000;
+          padding: 6px;
           margin-top: 4px;
         }
 
@@ -393,8 +396,32 @@ const ThermalInvoice = ({
           <>
             <div className="info-row">
               <div className="info-label">Customer:</div>
-              <div className="info-value">{customer?.name || 'Walk-in Customer'}</div>
+              <div className="info-value">{customer?.name || customer?.business_name || 'Walk-in Customer'}</div>
             </div>
+            {customer?.customer_type === 'retailer' && customer?.business_name && (
+              <div className="info-row">
+                <div className="info-label">Business:</div>
+                <div className="info-value">{customer.business_name}</div>
+              </div>
+            )}
+            {customer?.customer_type === 'retailer' && customer?.gstin && (
+              <div className="info-row">
+                <div className="info-label">GSTIN:</div>
+                <div className="info-value">{customer.gstin}</div>
+              </div>
+            )}
+            {customer?.customer_type === 'retailer' && customer?.drug_license_number && (
+              <div className="info-row">
+                <div className="info-label">Drug License:</div>
+                <div className="info-value">{customer.drug_license_number}</div>
+              </div>
+            )}
+            {customer?.customer_type === 'retailer' && customer?.fssai_number && (
+              <div className="info-row">
+                <div className="info-label">FSSAI No:</div>
+                <div className="info-value">{customer.fssai_number}</div>
+              </div>
+            )}
             {customer?.phone && (
               <div className="info-row">
                 <div className="info-label">Phone:</div>

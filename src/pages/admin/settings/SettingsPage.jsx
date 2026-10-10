@@ -1,7 +1,190 @@
-import React from 'react'
-import { Settings, Save, Upload, Download } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Save, Upload, Download, Loader2 } from 'lucide-react'
+import { supabase } from '../../../lib/supabase'
+import toast from 'react-hot-toast'
 
 const SettingsPage = () => {
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [settingsId, setSettingsId] = useState(null)
+  const [formData, setFormData] = useState({
+    pharmacy_name: '',
+    phone: '',
+    address: '',
+    email: '',
+    website: '',
+    gstin: '',
+    drug_license_number: '',
+    fssai_number: '',
+    state: '',
+    cgst_rate: 9,
+    sgst_rate: 9,
+    invoice_prefix: 'INV',
+    invoice_footer: 'Thank you for your business!',
+    auto_print_invoice: true,
+    logo_url: '',
+    low_stock_threshold: 10,
+    expiry_alert_days: 30,
+    block_expired_sales: true
+  })
+
+  useEffect(() => {
+    fetchSettings()
+  }, [])
+
+  const fetchSettings = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('settings')
+        .select('*')
+        .limit(1)
+        .single()
+
+      if (error) {
+        // If no settings exist, create default
+        if (error.code === 'PGRST116') {
+          const { data: newData, error: insertError } = await supabase
+            .from('settings')
+            .insert([{
+              pharmacy_name: 'My Pharmacy',
+              cgst_rate: 9,
+              sgst_rate: 9,
+              invoice_prefix: 'INV',
+              invoice_footer: 'Thank you for your business!',
+              auto_print_invoice: true,
+              low_stock_threshold: 10,
+              expiry_alert_days: 30,
+              block_expired_sales: true
+            }])
+            .select()
+            .single()
+
+          if (insertError) throw insertError
+          
+          setSettingsId(newData.id)
+          setFormData({
+            ...formData,
+            ...newData
+          })
+        } else {
+          throw error
+        }
+      } else {
+        setSettingsId(data.id)
+        setFormData({
+          ...formData,
+          ...data
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+      toast.error('Failed to load settings')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }))
+  }
+
+  const handleSave = async () => {
+    try {
+      setSaving(true)
+
+      const { error } = await supabase
+        .from('settings')
+        .update({
+          ...formData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', settingsId)
+
+      if (error) throw error
+
+      toast.success('Settings saved successfully')
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      toast.error('Failed to save settings')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop()
+      const fileName = `logo-${Date.now()}.${fileExt}`
+      
+      const { error: uploadError, data } = await supabase.storage
+        .from('pharmacy-assets')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('pharmacy-assets')
+        .getPublicUrl(fileName)
+
+      setFormData(prev => ({ ...prev, logo_url: publicUrl }))
+      toast.success('Logo uploaded successfully')
+    } catch (error) {
+      console.error('Error uploading logo:', error)
+      toast.error('Failed to upload logo')
+    }
+  }
+
+  const handleExportData = async () => {
+    try {
+      toast('Exporting data...')
+      
+      // Export all tables
+      const tables = ['customers', 'medicines', 'medicine_batches', 'sales', 'purchases', 'wholesalers']
+      const exportData = {}
+      
+      for (const table of tables) {
+        const { data, error } = await supabase
+          .from(table)
+          .select('*')
+        
+        if (!error && data) {
+          exportData[table] = data
+        }
+      }
+      
+      // Download as JSON
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `pharmacy-data-${new Date().toISOString().split('T')[0]}.json`
+      a.click()
+      
+      toast.success('Data exported successfully')
+    } catch (error) {
+      console.error('Export error:', error)
+      toast.error('Failed to export data')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -9,28 +192,44 @@ const SettingsPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">System Settings</h1>
           <p className="text-gray-600">Configure pharmacy settings and preferences</p>
         </div>
-        <button className="btn-primary">
-          <Save className="h-4 w-4 mr-2" />
-          Save Changes
+        <button 
+          onClick={handleSave}
+          disabled={saving}
+          className="btn-primary disabled:opacity-50"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Save Changes
+            </>
+          )}
         </button>
       </div>
 
       {/* Settings Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pharmacy Information */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
           <div className="card">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Pharmacy Information</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pharmacy Name
+                    Pharmacy Name *
                   </label>
                   <input
                     type="text"
-                    defaultValue="MediCare Pharmacy"
+                    name="pharmacy_name"
+                    value={formData.pharmacy_name}
+                    onChange={handleChange}
                     className="input-field"
+                    required
                   />
                 </div>
                 <div>
@@ -39,7 +238,9 @@ const SettingsPage = () => {
                   </label>
                   <input
                     type="text"
-                    defaultValue="+91 98765 43210"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                     className="input-field"
                   />
                 </div>
@@ -51,7 +252,9 @@ const SettingsPage = () => {
                 </label>
                 <textarea
                   rows={3}
-                  defaultValue="123 Main Street, Medical District, City, State - 123456"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
                   className="input-field"
                 />
               </div>
@@ -63,7 +266,9 @@ const SettingsPage = () => {
                   </label>
                   <input
                     type="email"
-                    defaultValue="info@medicare.com"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     className="input-field"
                   />
                 </div>
@@ -73,7 +278,9 @@ const SettingsPage = () => {
                   </label>
                   <input
                     type="url"
-                    defaultValue="https://medicare.com"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleChange}
                     className="input-field"
                   />
                 </div>
@@ -92,7 +299,9 @@ const SettingsPage = () => {
                   </label>
                   <input
                     type="text"
-                    defaultValue="22AAAAA0000A1Z5"
+                    name="gstin"
+                    value={formData.gstin}
+                    onChange={handleChange}
                     className="input-field"
                   />
                 </div>
@@ -102,7 +311,9 @@ const SettingsPage = () => {
                   </label>
                   <input
                     type="text"
-                    defaultValue="DL-1234567890"
+                    name="drug_license_number"
+                    value={formData.drug_license_number}
+                    onChange={handleChange}
                     className="input-field"
                   />
                 </div>
@@ -111,22 +322,42 @@ const SettingsPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    FSSAI Number
+                  </label>
+                  <input
+                    type="text"
+                    name="fssai_number"
+                    value={formData.fssai_number}
+                    onChange={handleChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     State
                   </label>
-                  <select className="input-field">
-                    <option>Maharashtra</option>
-                    <option>Gujarat</option>
-                    <option>Karnataka</option>
-                    <option>Delhi</option>
-                  </select>
+                  <input
+                    type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    className="input-field"
+                    placeholder="e.g., Maharashtra"
+                  />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     CGST Rate (%)
                   </label>
                   <input
                     type="number"
-                    defaultValue="9"
+                    name="cgst_rate"
+                    value={formData.cgst_rate}
+                    onChange={handleChange}
+                    step="0.01"
                     className="input-field"
                   />
                 </div>
@@ -136,7 +367,10 @@ const SettingsPage = () => {
                   </label>
                   <input
                     type="number"
-                    defaultValue="9"
+                    name="sgst_rate"
+                    value={formData.sgst_rate}
+                    onChange={handleChange}
+                    step="0.01"
                     className="input-field"
                   />
                 </div>
@@ -155,7 +389,9 @@ const SettingsPage = () => {
                   </label>
                   <input
                     type="text"
-                    defaultValue="INV"
+                    name="invoice_prefix"
+                    value={formData.invoice_prefix}
+                    onChange={handleChange}
                     className="input-field"
                   />
                 </div>
@@ -165,7 +401,9 @@ const SettingsPage = () => {
                   </label>
                   <input
                     type="text"
-                    defaultValue="Thank you for your business!"
+                    name="invoice_footer"
+                    value={formData.invoice_footer}
+                    onChange={handleChange}
                     className="input-field"
                   />
                 </div>
@@ -175,7 +413,9 @@ const SettingsPage = () => {
                 <input
                   type="checkbox"
                   id="auto_print"
-                  defaultChecked
+                  name="auto_print_invoice"
+                  checked={formData.auto_print_invoice}
+                  onChange={handleChange}
                   className="h-4 w-4 text-primary-600 rounded"
                 />
                 <label htmlFor="auto_print" className="text-sm text-gray-700">
@@ -191,13 +431,23 @@ const SettingsPage = () => {
           <div className="card">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Pharmacy Logo</h3>
             <div className="text-center">
-              <div className="w-32 h-32 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-primary-600">Rx</span>
+              <div className="w-32 h-32 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+                {formData.logo_url ? (
+                  <img src={formData.logo_url} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-2xl font-bold text-primary-600">Rx</span>
+                )}
               </div>
-              <button className="btn-secondary">
+              <label className="btn-secondary cursor-pointer">
                 <Upload className="h-4 w-4 mr-2" />
                 Upload Logo
-              </button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+              </label>
             </div>
           </div>
 
@@ -210,7 +460,9 @@ const SettingsPage = () => {
                 </label>
                 <input
                   type="number"
-                  defaultValue="10"
+                  name="low_stock_threshold"
+                  value={formData.low_stock_threshold}
+                  onChange={handleChange}
                   className="input-field"
                 />
               </div>
@@ -221,7 +473,9 @@ const SettingsPage = () => {
                 </label>
                 <input
                   type="number"
-                  defaultValue="30"
+                  name="expiry_alert_days"
+                  value={formData.expiry_alert_days}
+                  onChange={handleChange}
                   className="input-field"
                 />
               </div>
@@ -229,10 +483,13 @@ const SettingsPage = () => {
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="allow_expired_sales"
+                  id="block_expired_sales"
+                  name="block_expired_sales"
+                  checked={formData.block_expired_sales}
+                  onChange={handleChange}
                   className="h-4 w-4 text-primary-600 rounded"
                 />
-                <label htmlFor="allow_expired_sales" className="text-sm text-gray-700">
+                <label htmlFor="block_expired_sales" className="text-sm text-gray-700">
                   Block expired medicine sales
                 </label>
               </div>
@@ -242,16 +499,12 @@ const SettingsPage = () => {
           <div className="card">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Management</h3>
             <div className="space-y-3">
-              <button className="w-full btn-secondary">
+              <button 
+                onClick={handleExportData}
+                className="w-full btn-secondary"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Export Data
-              </button>
-              <button className="w-full btn-secondary">
-                <Upload className="h-4 w-4 mr-2" />
-                Import Data
-              </button>
-              <button className="w-full btn-danger">
-                Reset All Data
               </button>
             </div>
           </div>

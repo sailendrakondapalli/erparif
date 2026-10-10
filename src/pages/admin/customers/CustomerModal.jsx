@@ -363,18 +363,32 @@ const CustomerModal = ({ customer, onClose, onSave }) => {
                   )}
 
                   {customerType === 'retailer' && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Opening Balance (₹)
-                      </label>
-                      <input
-                        {...register('opening_balance')}
-                        type="number"
-                        step="0.01"
-                        className="input-field"
-                        placeholder="Enter opening balance"
-                      />
-                    </div>
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          FSSAI Number
+                        </label>
+                        <input
+                          {...register('fssai_number')}
+                          type="text"
+                          className="input-field"
+                          placeholder="Enter FSSAI number"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Opening Balance (₹)
+                        </label>
+                        <input
+                          {...register('opening_balance')}
+                          type="number"
+                          step="0.01"
+                          className="input-field"
+                          placeholder="Enter opening balance"
+                        />
+                      </div>
+                    </>
                   )}
                 </>
               )}

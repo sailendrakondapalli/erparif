@@ -19,10 +19,7 @@ import POSPage from './pages/admin/pos/POSPage'
 import SalesPage from './pages/admin/sales/SalesPage'
 import PurchasesPage from './pages/admin/purchases/PurchasesPage'
 import CustomersPage from './pages/admin/customers/CustomersPage'
-import RetailersPage from './pages/admin/retailers/RetailersPage'
 import WholesalersPage from './pages/admin/wholesalers/WholesalersPage'
-import PaymentsPage from './pages/admin/payments/PaymentsPage'
-import ReportsPage from './pages/admin/reports/ReportsPage'
 import UsersPage from './pages/admin/users/UsersPage'
 import SettingsPage from './pages/admin/settings/SettingsPage'
 
@@ -85,10 +82,7 @@ function App() {
                     <Route path="sales" element={<SalesPage />} />
                     <Route path="purchases" element={<PurchasesPage />} />
                     <Route path="customers" element={<CustomersPage />} />
-                    <Route path="retailers" element={<RetailersPage />} />
                     <Route path="wholesalers" element={<WholesalersPage />} />
-                    <Route path="payments" element={<PaymentsPage />} />
-                    <Route path="reports" element={<ReportsPage />} />
                     <Route path="users" element={<UsersPage />} />
                     <Route path="settings" element={<SettingsPage />} />
                   </Routes>
